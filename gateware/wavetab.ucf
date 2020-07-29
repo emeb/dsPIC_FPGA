@@ -1,0 +1,73 @@
+# UCF constraints file for spi_tst FPGA in XC3S200AVQ100
+# main clock input
+NET "FPGA_CLK"  LOC = "P90"  ;
+NET "FPGA_CLK" TNM_NET = "FPGA_CLK";
+TIMESPEC "TS_FPGA_CLK" = PERIOD "FPGA_CLK" 40 ns HIGH 50 %;
+OFFSET = IN 10 ns BEFORE "FPGA_CLK"  ;
+OFFSET = OUT 10 ns AFTER "FPGA_CLK"  ;
+NET "FPGA_CLK" IOSTANDARD = LVCMOS33;
+
+# We're running this part with VCCAUX = 3.3V
+CONFIG VCCAUX=3.3;
+
+# SPI Control port
+NET "FPGA_CSL"  LOC = "P46" ;
+NET "FPGA_MOSI"  LOC = "P51" ;
+NET "FPGA_MISO"  LOC = "P52" ;
+NET "FPGA_SCLK"  LOC = "P53" ;
+NET "FPGA_SCLK"  CLOCK_DEDICATED_ROUTE ;
+NET "FPGA_SCLK" TNM_NET = "FPGA_SCLK";
+TIMESPEC "TS_FPGA_SCLK" = PERIOD "FPGA_SCLK" 20 ns HIGH 50 %;
+NET "FPGA_IRQ"  LOC = "P59" ;
+NET "FPGA_SPI_REQ_L"  LOC = "P28" ;
+NET "FPGA_SPI_ACK_L"  LOC = "P60" ;
+NET "FPGA_*" IOSTANDARD = LVCMOS33;
+
+# Flash 
+NET "FLASH_SCK"  LOC = "P3" ;
+NET "FLASH_SI"  LOC = "P4" ;
+NET "FLASH_SO"  LOC = "P5" ;
+NET "FLASH_WP"  LOC = "P10" ;
+NET "FLASH_CS"  LOC = "P12" ;
+NET "FLASH_RST"  LOC = "P13" ;
+NET "FLASH_*" IOSTANDARD = LVCMOS33;
+
+# DAC
+NET "DAC_MCLK"  LOC = "P15" ;
+NET "DAC_SCLK"  LOC = "P19" ;
+NET "DAC_LRCK"  LOC = "P16" ;
+NET "DAC_SDIN"  LOC = "P20" ;
+NET "DAC_*" IOSTANDARD = LVCMOS33;
+
+# Aux port
+NET "AUX1<0>"  LOC = "P73" ;
+NET "AUX1<1>"  LOC = "P72" ;
+NET "AUX1<2>"  LOC = "P71" ;
+NET "AUX1<3>"  LOC = "P70" ;
+NET "AUX2<0>"  LOC = "P86" ;
+NET "AUX2<1>"  LOC = "P85" ;
+NET "AUX2<2>"  LOC = "P84" ;
+NET "AUX2<3>"  LOC = "P83" ;
+NET "AUX3<0>"  LOC = "P94" ;
+NET "AUX3<1>"  LOC = "P93" ;
+NET "AUX3<2>"  LOC = "P89" ;
+NET "AUX3<3>"  LOC = "P88" ;
+NET "AUX*" IOSTANDARD = LVCMOS33;
+
+# LED
+NET "FPGA_ACT"  LOC = "P64" ;
+NET "FPGA_ACT" IOSTANDARD = LVCMOS33;
+
+# Timing Constraints & Exceptions
+
+# Ignore clock crossing from clk to spi_clk
+NET FPGA_CLK TNM = FPGA_CLK_grp;
+NET FPGA_SCLK TNM = FPGA_SCLK_grp;
+TIMESPEC TS_clk_cross1 = FROM FPGA_CLK_grp TO FPGA_SCLK_grp TIG;
+TIMESPEC TS_clk_cross2 = FROM FPGA_SCLK_grp TO FPGA_CLK_grp TIG;
+
+# Ignore timing from SPI mux
+TIMESPEC TS_spi_mux1 = FROM FFS(uut/wrt_mux) to PADS(FPGA_*) TIG;
+TIMESPEC TS_spi_mux2 = FROM FFS(uut/wrt_mux) to PADS(FLASH_*) TIG;
+
+# junk
